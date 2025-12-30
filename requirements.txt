@@ -1,0 +1,19 @@
+# 택배상자 질량 중심 제어 - PPO 강화학습
+# Python 3.10+ 필요
+
+# 강화학습 프레임워크
+gymnasium>=0.29.0
+stable-baselines3>=2.2.0
+
+# 물리 시뮬레이션
+mujoco>=3.0.0
+
+# 수치 계산
+numpy>=1.24.0
+
+# 시각화 (선택사항)
+matplotlib>=3.7.0
+tensorboard>=2.14.0
+
+# 기타
+tqdm>=4.65.0

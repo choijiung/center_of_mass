@@ -1,0 +1,100 @@
+<mujoco model="delivery_box_com_control">
+  <!--
+    택배상자 질량 중심 제어 장치 모델
+    - 택배상자: 250mm x 250mm x 250mm, 5kg
+    - 질량체: 1kg, CoreXY 방식으로 X-Y 평면에서 이동
+    - 낙하 높이: 3.7m
+  -->
+
+  <compiler angle="radian" coordinate="local"/>
+
+  <option timestep="0.001" gravity="0 0 -9.81" integrator="RK4">
+    <flag sensornoise="disable"/>
+  </option>
+
+  <default>
+    <joint damping="0.1" armature="0.01"/>
+    <geom condim="4" friction="0.8 0.05 0.001"/>
+    <motor ctrllimited="true" ctrlrange="-50 50"/>
+  </default>
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.2 0.3" rgb2="0.2 0.3 0.4" width="512" height="512"/>
+    <material name="grid_mat" texture="grid" texrepeat="5 5" reflectance="0.2"/>
+    <material name="box_mat" rgba="0.6 0.4 0.2 0.8"/>
+    <material name="mass_mat" rgba="0.8 0.2 0.2 1"/>
+  </asset>
+
+  <worldbody>
+    <!-- 바닥 -->
+    <geom name="floor" type="plane" size="5 5 0.1" material="grid_mat" conaffinity="1" contype="1"/>
+
+    <!-- 택배상자 본체 (5kg, 250x250x250mm) -->
+    <!-- 초기 위치: 3.7m 높이 + 상자 절반 높이 -->
+    <body name="box_body" pos="0 0 3.825">
+      <freejoint name="box_joint"/>
+
+      <!-- 센서용 사이트 -->
+      <site name="box_center" pos="0 0 0" size="0.01"/>
+
+      <!-- 상자 프레임 (테두리만 표현, 내부는 비어있음) -->
+      <!-- 바닥면 -->
+      <geom name="box_bottom" type="box" size="0.125 0.125 0.005" pos="0 0 -0.12"
+            mass="1.0" material="box_mat" conaffinity="1" contype="1"/>
+      <!-- 윗면 -->
+      <geom name="box_top" type="box" size="0.125 0.125 0.005" pos="0 0 0.12"
+            mass="0.8" material="box_mat" conaffinity="1" contype="1"/>
+      <!-- 앞면 -->
+      <geom name="box_front" type="box" size="0.125 0.005 0.115" pos="0 0.12 0"
+            mass="0.8" material="box_mat" conaffinity="1" contype="1"/>
+      <!-- 뒷면 -->
+      <geom name="box_back" type="box" size="0.125 0.005 0.115" pos="0 -0.12 0"
+            mass="0.8" material="box_mat" conaffinity="1" contype="1"/>
+      <!-- 왼쪽면 -->
+      <geom name="box_left" type="box" size="0.005 0.115 0.115" pos="-0.12 0 0"
+            mass="0.8" material="box_mat" conaffinity="1" contype="1"/>
+      <!-- 오른쪽면 -->
+      <geom name="box_right" type="box" size="0.005 0.115 0.115" pos="0.12 0 0"
+            mass="0.8" material="box_mat" conaffinity="1" contype="1"/>
+
+      <!-- CoreXY 질량체 시스템 -->
+      <!-- X축 슬라이드 (레일) -->
+      <body name="x_rail" pos="0 0 -0.10">
+        <joint name="joint_x" type="slide" axis="1 0 0" range="-0.10 0.10" damping="0.5"/>
+
+        <!-- Y축 슬라이드 (질량체) -->
+        <body name="mass_body" pos="0 0 0">
+          <joint name="joint_y" type="slide" axis="0 1 0" range="-0.10 0.10" damping="0.5"/>
+
+          <!-- 제어 질량체 (1kg) -->
+          <geom name="control_mass" type="cylinder" size="0.03 0.02" mass="1.0"
+                material="mass_mat" conaffinity="0" contype="0"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- 액추에이터: CoreXY 모터 (X, Y 방향 제어) -->
+  <actuator>
+    <motor name="motor_x" joint="joint_x" gear="1" ctrllimited="true" ctrlrange="-50 50"/>
+    <motor name="motor_y" joint="joint_y" gear="1" ctrllimited="true" ctrlrange="-50 50"/>
+  </actuator>
+
+  <!-- 센서 -->
+  <sensor>
+    <!-- 상자 위치/자세 -->
+    <framepos name="box_pos" objtype="body" objname="box_body"/>
+    <framequat name="box_quat" objtype="body" objname="box_body"/>
+    <framelinvel name="box_linvel" objtype="body" objname="box_body"/>
+    <frameangvel name="box_angvel" objtype="body" objname="box_body"/>
+
+    <!-- 질량체 위치 (상자 기준) -->
+    <jointpos name="mass_x" joint="joint_x"/>
+    <jointpos name="mass_y" joint="joint_y"/>
+
+    <!-- 가속도계 및 자이로 -->
+    <accelerometer name="box_acc" site="box_center"/>
+    <gyro name="box_gyro" site="box_center"/>
+  </sensor>
+
+</mujoco>
