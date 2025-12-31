@@ -181,7 +181,7 @@ def train(args):
             total_timesteps=args.total_timesteps,
             callback=callbacks,
             log_interval=args.log_interval,
-            progress_bar=True,
+            progress_bar=False,
         )
     except KeyboardInterrupt:
         print("\n훈련이 사용자에 의해 중단되었습니다.")
