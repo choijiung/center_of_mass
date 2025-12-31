@@ -56,9 +56,12 @@
             mass="0.8" material="box_mat" conaffinity="1" contype="1"/>
 
       <!-- CoreXY 질량체 시스템 -->
-      <!-- X축 슬라이드 (레일) -->
+      <!-- X축 슬라이드 (레일) - 0.05kg -->
       <body name="x_rail" pos="0 0 -0.10">
         <joint name="joint_x" type="slide" axis="1 0 0" range="-0.10 0.10" damping="0.5"/>
+        <!-- X축 레일 (작은 질량) -->
+        <geom name="x_rail_geom" type="box" size="0.10 0.005 0.005" mass="0.05"
+              rgba="0.5 0.5 0.5 0.5" conaffinity="0" contype="0"/>
 
         <!-- Y축 슬라이드 (질량체) -->
         <body name="mass_body" pos="0 0 0">
