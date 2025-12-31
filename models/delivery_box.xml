@@ -8,9 +8,7 @@
 
   <compiler angle="radian" coordinate="local"/>
 
-  <option timestep="0.001" gravity="0 0 -9.81" integrator="RK4">
-    <flag sensornoise="disable"/>
-  </option>
+  <option timestep="0.001" gravity="0 0 -9.81" integrator="RK4"/>
 
   <default>
     <joint damping="0.1" armature="0.01"/>
